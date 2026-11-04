@@ -59,7 +59,17 @@ if [ -n "${CAMOFOX_UID:-}" ] && [ -n "${CAMOFOX_GID:-}" ]; then
   # read world-readable files, which 755 already allows) so new subdirs can
   # be created without recursively re-owning the whole Camoufox install on
   # every container start.
-  chown "${CAMOFOX_UID}:${CAMOFOX_GID}" /root/.cache/camoufox
+  # /root/.cache itself (not just /root/.cache/camoufox) needs the same
+  # treatment: Firefox/Camoufox lazily creates several OTHER sibling cache
+  # dirs directly under /root/.cache at runtime too -- .cache/fontconfig
+  # (font cache) and .cache/dconf (GSettings backend) both failed with
+  # EACCES/"Permission denied" in testing, each logged as noisy warnings on
+  # every launch attempt even though they don't by themselves explain a
+  # launch timeout. chown just /root/.cache itself (still NOT recursive --
+  # .cache/camoufox's binary tree underneath keeps its own ownership from
+  # the chown above) so any NEW sibling dir Firefox decides to create next
+  # also just works, instead of patching this file again for the next one.
+  chown "${CAMOFOX_UID}:${CAMOFOX_GID}" /root/.cache /root/.cache/camoufox
   export HOME=/root
   exec setpriv --reuid "${CAMOFOX_UID}" --regid "${CAMOFOX_GID}" --init-groups "$@"
 fi
