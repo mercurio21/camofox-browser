@@ -113,7 +113,10 @@ ENV CAMOFOX_PORT=9377
 
 EXPOSE 9377
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
 CMD ["sh", "-c", "exec node --max-old-space-size=${MAX_OLD_SPACE_SIZE:-128} server.js"]
 
 # Optional: rebuild plugin deps after adding third-party plugins
