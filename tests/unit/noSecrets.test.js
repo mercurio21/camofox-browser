@@ -74,13 +74,9 @@ describe('no embedded secrets in distributed files', () => {
     expect(toml).toContain('name = "camofox-telemetry"');
   });
 
-  test('deploy workflow triggers on worker changes from main', () => {
-    const workflow = readFileSync(join(__dirname, '../../.github/workflows/telemetry-deploy.yml'), 'utf-8');
-    expect(workflow).toContain('workers/crash-reporter/**');
-    expect(workflow).toContain('branches: [master]');
-    expect(workflow).toContain('CLOUDFLARE_API_TOKEN');
-    expect(workflow).toContain('CLOUDFLARE_ACCOUNT_ID');
-    expect(workflow).toContain('__COMMIT_SHA__');
-    expect(workflow).toContain('__SOURCE_SHA256__');
-  });
+  // No "deploy workflow triggers on worker changes from main" test here: it
+  // asserted the shape of .github/workflows/telemetry-deploy.yml, which
+  // deployed upstream's own Cloudflare Workers telemetry endpoint. This fork
+  // deleted that workflow (no Cloudflare account for this repo) -- see the
+  // "chore: drop upstream GitHub Actions infra" commit.
 });
